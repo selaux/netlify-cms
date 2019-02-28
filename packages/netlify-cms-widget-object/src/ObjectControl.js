@@ -54,12 +54,23 @@ export default class ObjectControl extends Component {
   }
 
   validate = () => {
-    const { field } = this.props;
+    const { field, value } = this.props;
     let fields = field.get('field') || field.get('fields');
     fields = List.isList(fields) ? fields : List([fields]);
+
     fields.forEach(field => {
+      const fieldName = field.get('name');
+      const fieldValue = value.get(fieldName);
+
       if (field.get('widget') === 'hidden') return;
-      this.componentValidate[field.get('name')]();
+      if (
+        field.get('widget') === 'object' &&
+        !field.get('required', true) &&
+        fieldValue &&
+        fieldValue.size === 0
+      )
+        return;
+      this.componentValidate[fieldName]();
     });
   };
 
